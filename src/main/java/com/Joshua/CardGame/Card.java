@@ -40,11 +40,10 @@ public class Card {
 
     @Override
     public String toString() {
-        return "Card{" +
-                "cardNumber=" + cardNumber +
-                ", cardType='" + cardType + '\'' +
-                ", colorType='" + colorType + '\'' +
-                '}';
+        return "[" +
+                cardType.mark +
+                cardNumber.cardname +
+                ']';
     }
 
     public enum ColorType {
@@ -93,18 +92,20 @@ public class Card {
     }
 
     public enum CardType {
-        SPADE("spade"),
-        HEART("heart"),
-        DIAMOND("diamond"),
-        CLUB("club");
+        SPADE("spade", "♠"),
+        HEART("heart", "♥"),
+        DIAMOND("diamond", "♦"),
+        CLUB("club", "♣");
 
         private String value;
+        private String mark;
 
         CardType() {
         }
 
-        CardType(String value) {
+        CardType(String value, String mark) {
             this.value = value;
+            this.mark = mark;
         }
     }
 }
