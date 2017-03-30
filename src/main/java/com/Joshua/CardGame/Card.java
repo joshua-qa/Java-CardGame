@@ -94,7 +94,7 @@ public class Card {
     public enum CardType {
         SPADE("spade", "♠"),
         HEART("heart", "♥"),
-        DIAMOND("diamond", "♦"),
+        DIAMOND("diamond", "◆"),
         CLUB("club", "♣");
 
         private String value;
