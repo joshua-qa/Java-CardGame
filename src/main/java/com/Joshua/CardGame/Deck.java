@@ -11,7 +11,7 @@ public class Deck {
 
     public Deck() {
         this.cards = this.createCards();
-        //Collections.shuffle(this.cards);
+        Collections.shuffle(this.cards);
     }
 
     private Stack<Card> createCards() {

@@ -50,13 +50,17 @@ public class Card {
         RED("red"),
         BLACK("black");
 
-        private String value;
+        private String colorTypeValue;
 
         ColorType() {
         }
 
-        ColorType(String value) {
-            this.value = value;
+        ColorType(String colorTypeValue) {
+            this.colorTypeValue = colorTypeValue;
+        }
+
+        public String getColorTypeValue() {
+            return this.colorTypeValue;
         }
     }
 
@@ -97,15 +101,19 @@ public class Card {
         DIAMOND("diamond", "◆"),
         CLUB("club", "♣");
 
-        private String value;
+        private String cardValue;
         private String mark;
 
         CardType() {
         }
 
-        CardType(String value, String mark) {
-            this.value = value;
+        CardType(String cardValue, String mark) {
+            this.cardValue = cardValue;
             this.mark = mark;
+        }
+
+        public String getMark() {
+            return this.mark;
         }
     }
 }

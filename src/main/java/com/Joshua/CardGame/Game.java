@@ -43,19 +43,78 @@ public class Game {
         return true;
     }
 
-    public boolean move() {
+    public boolean move(Stack<Card> start, Stack<Card> dest, Scanner sc) {
+        System.out.println("이동할 카드 장수를 입력해주세요. 메뉴로 돌아가시려면 0번을 입력해주세요");
+        int select = inputCheck(sc);
+        boolean flag = true;
+        Stack<Card> temp = new Stack<>();
+
+        while(flag) {
+            if (select == 0) {
+                return false;
+            } else if (select > 0 && select <= start.size()) {
+                if (isChain(start, select)) {
+                    flag = false;
+                    break;
+                } else {
+                    System.out.println("카드가 연결되어 있지 않습니다. 연결되어있는 장수 이내에서 입력해주세요.");
+                }
+            } else {
+                System.err.println("잘못 입력하셨습니다. 다시 입력해주세요.");
+                return move(start, dest, sc);
+            }
+        }
+
+        if(dest.size() == 0) {
+            
+        }
+
+        if(isMovable(start.elementAt(select-1), dest.peek())) {
+            for (int i = 0; i < select; i++) {
+                temp.push(start.pop());
+            }
+            for (int j = 0; j < select; j++) {
+                dest.push(temp.pop());
+            }
+
+            System.out.println("카드가 " + select + "장 이동되었습니다.");
+        } else {
+            System.err.println("그곳으로는 이동할 수 없습니다. 이동할 카드 장수를 다시 입력해주시거나, 메뉴로 돌아가서 이동할 위치를 다시 입력해주세요.");
+            return move(start, dest, sc);
+        }
+
         return true;
     }
 
-    public boolean moveHome() {
+    public boolean moveHome(Stack<Card> start) {
         return true;
     }
 
-    public boolean isKing() {
+    public boolean isKing(Card card) {
+        return card.getCardNumber().getRank() == 13;
+    }
+
+    public boolean isAce(Card card) {
+        return card.getCardNumber().getRank() == 1;
+    }
+
+    public boolean isChain(Stack<Card> field, int input) {
+        for (int i = 0; i < input-1; i++) {
+            if (! ((field.elementAt(i).getCardNumber().getRank() == field.elementAt(i+1).getCardNumber().getRank()-1)
+                && (!field.elementAt(i).getColorType().getColorTypeValue().equals( field.elementAt(i+1).getColorType().getColorTypeValue() ))) ) {
+                return false;
+            }
+        }
+
         return true;
     }
 
-    public boolean isAce() {
+    public boolean isMovable(Card start, Card dest) {
+        if (! ((start.getCardNumber().getRank() == dest.getCardNumber().getRank()-1)
+                && (!start.getColorType().getColorTypeValue().equals( dest.getColorType().getColorTypeValue() ))) ) {
+            return false;
+        }
+
         return true;
     }
 
@@ -81,7 +140,7 @@ public class Game {
         for (int i = 0; i < getFieldMaxSize(); i++) {
             for (int j = 0; j < field.length; j++) {
                 if (field[j].size() <= i) {
-                    System.out.print("       ");
+                    System.out.print("      ");
                 } else {
                     System.out.print(field[j].elementAt(i).toString() + " ");
                     if (field[j].elementAt(i).getCardNumber().getRank() != 10) {
@@ -115,7 +174,7 @@ public class Game {
     public void menu() {
         Scanner scan = new Scanner(System.in);
         boolean flag = true;
-        int select = 0;
+        int select = 0, selectTarget = 0;
 
         // 메서드 분리 필요할듯.
         while(flag) {
@@ -129,11 +188,11 @@ public class Game {
                 select = inputCheck(scan);
                 if(select > 0 && select <= 7) {
                     System.out.println("이동하려는 위치를 입력해주세요. (필드는 1-7, 홈은 0)");
-                    select = inputCheck(scan);
-                    if(select == 0) {
-                        moveHome();
-                    } else if(select > 0 && select <= 7) {
-                        move();
+                    selectTarget = inputCheck(scan);
+                    if(selectTarget == 0) {
+                        moveHome(field[select-1]);
+                    } else if(selectTarget > 0 && selectTarget <= 7) {
+                        move(field[select-1], field[selectTarget-1], scan);
                     } else {
                         inputError();
                     }
