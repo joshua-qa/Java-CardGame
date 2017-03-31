@@ -47,7 +47,6 @@ public class Game {
         System.out.println("이동할 카드 장수를 입력해주세요. 메뉴로 돌아가시려면 0번을 입력해주세요");
         int select = inputCheck(sc);
         boolean flag = true;
-        Stack<Card> temp = new Stack<>();
 
         while(flag) {
             if (select == 0) {
@@ -58,6 +57,7 @@ public class Game {
                     break;
                 } else {
                     System.out.println("카드가 연결되어 있지 않습니다. 연결되어있는 장수 이내에서 입력해주세요.");
+                    return move(start, dest, sc);
                 }
             } else {
                 System.err.println("잘못 입력하셨습니다. 다시 입력해주세요.");
@@ -69,25 +69,43 @@ public class Game {
             
         }
 
-        if(isMovable(start.elementAt(select-1), dest.peek())) {
-            for (int i = 0; i < select; i++) {
-                temp.push(start.pop());
-            }
-            for (int j = 0; j < select; j++) {
-                dest.push(temp.pop());
-            }
+        if(isKing(start.elementAt(cardPosition(start, select))) && dest.isEmpty()) {
+            moveCard(start, dest, select);
+            return true;
+        } else if(!isKing(start.elementAt(cardPosition(start, select))) && dest.isEmpty()) {
+            System.err.println("이동하려는 필드가 비어있지만 옮기려는 카드에 킹이 포함되어 있지 않습니다.\n메뉴로 돌아가서 이동할 위치를 다시 입력해주세요.");
+            return false;
+        }
 
-            System.out.println("카드가 " + select + "장 이동되었습니다.");
+        if(isMovable(start.elementAt(cardPosition(start, select)), dest.peek())) {
+            moveCard(start, dest, select);
         } else {
-            System.err.println("그곳으로는 이동할 수 없습니다. 이동할 카드 장수를 다시 입력해주시거나, 메뉴로 돌아가서 이동할 위치를 다시 입력해주세요.");
+            System.err.println("그곳으로는 이동할 수 없습니다.\n이동할 카드 장수를 다시 입력해주시거나, 메뉴로 돌아가서 이동할 위치를 다시 입력해주세요.");
             return move(start, dest, sc);
         }
 
         return true;
     }
 
+    private int cardPosition(Stack<Card> target, int index) {
+        return target.size() - index;
+    }
+
     public boolean moveHome(Stack<Card> start) {
         return true;
+    }
+
+    private void moveCard(Stack<Card> start, Stack<Card> dest, int select) {
+        Stack<Card> temp = new Stack<>();
+
+        for (int i = 0; i < select; i++) {
+            temp.push(start.pop());
+        }
+        for (int j = 0; j < select; j++) {
+            dest.push(temp.pop());
+        }
+
+        System.out.println("카드가 " + select + "장 이동되었습니다.");
     }
 
     public boolean isKing(Card card) {
@@ -99,9 +117,9 @@ public class Game {
     }
 
     public boolean isChain(Stack<Card> field, int input) {
-        for (int i = 0; i < input-1; i++) {
-            if (! ((field.elementAt(i).getCardNumber().getRank() == field.elementAt(i+1).getCardNumber().getRank()-1)
-                && (!field.elementAt(i).getColorType().getColorTypeValue().equals( field.elementAt(i+1).getColorType().getColorTypeValue() ))) ) {
+        for (int i = field.size() - input; i < field.size() - 1; i++) {
+            if (! ((field.elementAt(i).getCardNumber().getRank() + 1 == field.elementAt(i-1).getCardNumber().getRank())
+                && (!field.elementAt(i).getColorType().getColorTypeValue().equals( field.elementAt(i-1).getColorType().getColorTypeValue() ))) ) {
                 return false;
             }
         }
@@ -186,7 +204,7 @@ public class Game {
             } else if(select == 2) {
                 System.out.println("이동할 카드가 있는 필드 번호를 입력해주세요. (1-7)");
                 select = inputCheck(scan);
-                if(select > 0 && select <= 7) {
+                if((select > 0 && select <= 7) && !field[select-1].isEmpty()) {
                     System.out.println("이동하려는 위치를 입력해주세요. (필드는 1-7, 홈은 0)");
                     selectTarget = inputCheck(scan);
                     if(selectTarget == 0) {
