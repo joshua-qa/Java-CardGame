@@ -4,9 +4,11 @@ import com.Joshua.CardGame.Game;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Stack;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -25,5 +27,11 @@ public class GameTest {
     public void mainDeckTest() {
         assertThat(game.deckCardPop(), is(true));
         assertThat(deck.getCards().isEmpty(), is(true));
+    }
+
+    @Test
+    public void toStringTest() {
+        String deckString = deck.toString();
+        assertNotNull(deckString);
     }
 }

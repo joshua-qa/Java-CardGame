@@ -9,7 +9,6 @@ public class Game {
     private Stack<Card> tempDeck, mainDeck;
     private Field[] field;
     private Home[] home; // 0 : spade, 1 : heart, 2 : diamond, 3 : club
-    ArrayList<Integer> fieldSizeArray = new ArrayList<>();
 
     public void init(Deck deck) {
         home = new Home[4];
@@ -222,15 +221,12 @@ public class Game {
     }
 
     private void cardDisplay() {
-        for (int i = 0; i < getFieldMaxSize(); i++) {
+        for (int i = 0; i < Field.getFieldMaxSize(field); i++) {
             for (int j = 0; j < field.length; j++) {
                 if (field[j].size() <= i) {
                     System.out.print("------ ");
                 } else {
                     System.out.print(field[j].elementAt(i).toString() + " ");
-//                    if (field[j].elementAt(i).getCardNumber().getRank() != 10) {
-//                        System.out.print(" ");
-//                    }
                 }
             }
             System.out.print("\n");
@@ -243,12 +239,7 @@ public class Game {
         cardDisplay();
     }
 
-    private int getFieldMaxSize() {
-        for (int i = 0; i < field.length; i++) {
-            fieldSizeArray.add(field[i].size());
-        }
-        return Collections.max(fieldSizeArray);
-    }
+
 
     public void play() {
         Deck deck = new Deck();
