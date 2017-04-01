@@ -33,8 +33,16 @@ public class Game {
     }
 
     public boolean deckCardPop() {
-        if (mainDeck.isEmpty()) {
-            System.err.print("덱에 더 이상 카드가 없습니다.\n");
+        if (mainDeck.isEmpty() && tempDeck.size() > 0) {
+            System.out.println("이전에 넘긴 카드를 다시 덱으로 돌립니다.");
+            int deckSize = tempDeck.size();
+            for(int i = 0; i < deckSize; i++) {
+                mainDeck.push(tempDeck.pop());
+            }
+
+            return false;
+        } else if (mainDeck.isEmpty() && tempDeck.size() == 0) {
+            System.err.println("더 이상 넘길 카드가 없습니다.\n");
             return false;
         } else {
             tempDeck.push(mainDeck.pop());
@@ -65,10 +73,6 @@ public class Game {
             }
         }
 
-        if(dest.size() == 0) {
-            
-        }
-
         if(isKing(start.elementAt(cardPosition(start, select))) && dest.isEmpty()) {
             moveCard(start, dest, select);
             return true;
@@ -92,6 +96,69 @@ public class Game {
     }
 
     public boolean moveHome(Stack<Card> start) {
+        if(isHomeMovable(start.peek())) {
+            int homeNumber = start.peek().getCardType().getCardValue();
+            moveCard(start, home[homeNumber], 1);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isHomeMovable(Card card) {
+        int homeNumber = card.getCardType().getCardValue();
+
+        // home이 비어있을 경우 카드가 Ace인지 확인
+        if(home[homeNumber].isEmpty()) {
+            if(isAce(card)) {
+                return true;
+            } else {
+                System.err.println("해당 무늬의 Ace부터 채워져야 합니다. 메뉴로 돌아가서 다시 시도해주세요.");
+                return false;
+            }
+        } else {
+            if(home[homeNumber].peek().getCardNumber().getRank() + 1 == card.getCardNumber().getRank()) {
+                return true;
+            } else {
+                System.err.println("해당 무늬의 " + (card.getCardNumber().getRank() - 1) + "번째 카드까지 홈에 채워주신 후 다시 시도해주세요.");
+                return false;
+            }
+        }
+    }
+
+    private boolean moveDeck(Scanner sc) {
+        if(tempDeck.isEmpty()) {
+            System.err.println("먼저 카드 넘기기를 한 뒤 시도해주세요.");
+            return false;
+        }
+
+        System.out.println("이동하려는 위치를 입력해주세요. (1-7, 홈은 0)\n메뉴로 돌아가려면 8번을 입력해주세요.");
+        int select = inputCheck(sc);
+
+        if(select == 0) {
+            moveHome(tempDeck);
+        } else if(select > 0 && select <= 7) {
+            if(field[select-1].isEmpty()) {
+                if (isKing(tempDeck.peek())) {
+                    moveCard(tempDeck, field[select-1], 1);
+                } else {
+                    System.out.println("해당 필드가 비어있지만 옮기려는 카드가 킹이 아닙니다. 메뉴로 돌아가서 다시 시도해주세요.");
+                    return false;
+                }
+            } else {
+                if (isMovable(tempDeck.peek(), field[select - 1].peek())) {
+                    moveCard(tempDeck, field[select - 1], 1);
+                } else {
+                    System.err.println("그곳으로는 이동하실 수 없습니다. 다른 위치를 입력해주세요.");
+                }
+            }
+        } else if(select == 8) {
+            return false;
+        } else {
+            inputError();
+            return moveDeck(sc);
+        }
+
         return true;
     }
 
@@ -118,8 +185,8 @@ public class Game {
 
     public boolean isChain(Stack<Card> field, int input) {
         for (int i = field.size() - input; i < field.size() - 1; i++) {
-            if (! ((field.elementAt(i).getCardNumber().getRank() + 1 == field.elementAt(i-1).getCardNumber().getRank())
-                && (!field.elementAt(i).getColorType().getColorTypeValue().equals( field.elementAt(i-1).getColorType().getColorTypeValue() ))) ) {
+            if (! ((field.elementAt(i).getCardNumber().getRank() - 1 == field.elementAt(i+1).getCardNumber().getRank())
+                && (!field.elementAt(i).getColorType().getColorTypeValue().equals( field.elementAt(i+1).getColorType().getColorTypeValue() ))) ) {
                 return false;
             }
         }
@@ -158,12 +225,12 @@ public class Game {
         for (int i = 0; i < getFieldMaxSize(); i++) {
             for (int j = 0; j < field.length; j++) {
                 if (field[j].size() <= i) {
-                    System.out.print("      ");
+                    System.out.print("------ ");
                 } else {
                     System.out.print(field[j].elementAt(i).toString() + " ");
-                    if (field[j].elementAt(i).getCardNumber().getRank() != 10) {
-                        System.out.print(" ");
-                    }
+//                    if (field[j].elementAt(i).getCardNumber().getRank() != 10) {
+//                        System.out.print(" ");
+//                    }
                 }
             }
             System.out.print("\n");
@@ -197,7 +264,7 @@ public class Game {
         // 메서드 분리 필요할듯.
         while(flag) {
             gameDisplay();
-            System.out.println("명령어를 입력해주세요. 1 : 카드 넘기기, 2 : 카드 이동, 9: 종료");
+            System.out.println("명령어를 입력해주세요. 1 : 카드 넘기기, 2 : 카드 이동(필드), 3 : 카드 이동(덱), 9: 종료");
             select = inputCheck(scan);
             if(select == 1) {
                 deckCardPop();
@@ -217,17 +284,38 @@ public class Game {
                 } else {
                     inputError();
                 }
+            } else if(select == 3) {
+                moveDeck(scan);
             } else if(select == 9) {
                 flag = false;
                 break;
             } else {
                 inputError();
             }
+
+            if(isGameClear()) {
+                System.out.println("게임에서 승리하셨습니다.");
+                flag = false;
+                break;
+            }
         }
 
         if(!flag) {
             gameover();
         }
+    }
+
+    private boolean isGameClear() {
+        for (int i = 0; i < home.length; i++) {
+            if (home[i].isEmpty()) {
+                return false;
+            } else {
+                if (home[i].peek().getCardNumber().getRank() != 13) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void gameover() {

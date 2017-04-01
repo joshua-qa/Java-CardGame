@@ -65,19 +65,19 @@ public class Card {
     }
 
     public enum CardNumber {
-        ACE("A", 1),
-        TWO("2", 2),
-        THREE("3", 3),
-        FOUR("4", 4),
-        FIVE("5", 5),
-        SIX("6", 6),
-        SEVEN("7", 7),
-        EIGHT("8", 8),
-        NINE("9", 9),
+        ACE(" A", 1),
+        TWO(" 2", 2),
+        THREE(" 3", 3),
+        FOUR(" 4", 4),
+        FIVE(" 5", 5),
+        SIX(" 6", 6),
+        SEVEN(" 7", 7),
+        EIGHT(" 8", 8),
+        NINE(" 9", 9),
         TEN("10", 10),
-        JACK("J", 11),
-        QUEEN("Q", 12),
-        KING("K", 13);
+        JACK(" J", 11),
+        QUEEN(" Q", 12),
+        KING(" K", 13);
 
         private String cardname;
         private int rank;
@@ -96,20 +96,24 @@ public class Card {
     }
 
     public enum CardType {
-        SPADE("spade", "♠"),
-        HEART("heart", "♥"),
-        DIAMOND("diamond", "◆"),
-        CLUB("club", "♣");
+        SPADE(0, "♠"),
+        HEART(1, "♥"),
+        DIAMOND(2, "◆"),
+        CLUB(3, "♣");
 
-        private String cardValue;
+        private int cardValue;
         private String mark;
 
         CardType() {
         }
 
-        CardType(String cardValue, String mark) {
+        CardType(int cardValue, String mark) {
             this.cardValue = cardValue;
             this.mark = mark;
+        }
+
+        public int getCardValue() {
+            return this.cardValue;
         }
 
         public String getMark() {
