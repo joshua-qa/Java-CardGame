@@ -7,11 +7,13 @@ public class Card {
     private CardNumber cardNumber;
     private CardType cardType;
     private ColorType colorType;
+    private boolean visibleType;
 
-    public Card(CardNumber cardNumber, CardType cardType, ColorType colorType) {
+    public Card(CardNumber cardNumber, CardType cardType, ColorType colorType, boolean visibleType) {
         this.cardNumber = cardNumber;
         this.cardType = cardType;
         this.colorType = colorType;
+        this.visibleType = visibleType;
     }
 
     public CardNumber getCardNumber() {
@@ -38,12 +40,24 @@ public class Card {
         this.colorType = colorType;
     }
 
+    public boolean getVisibleType() {
+        return visibleType;
+    }
+
+    public void setVisibleType(boolean visibleType) {
+        this.visibleType = visibleType;
+    }
+
     @Override
     public String toString() {
-        return "[" +
-                cardType.mark +
-                cardNumber.cardname +
-                ']';
+        if(visibleType) {
+            return "[" +
+                    cardType.mark +
+                    cardNumber.cardname +
+                    ']';
+        } else {
+            return "[ XX ]";
+        }
     }
 
     public enum ColorType {

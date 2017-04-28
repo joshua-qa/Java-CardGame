@@ -22,9 +22,11 @@ public class Game {
 
         for (int i = 0; i < field.length; i++) {
             field[i] = new Field();
-            for(int j = 0; j <= i; j++) {
+            for(int j = 0; j < i; j++) {
                 field[i].add(deck.getCards().pop());
+                field[i].peek().setVisibleType(false);
             }
+            field[i].add(deck.getCards().pop());
         }
 
         mainDeck = (Stack<Card>)deck.getCards().clone();
@@ -239,8 +241,6 @@ public class Game {
         cardDisplay();
     }
 
-
-
     public void play() {
         Deck deck = new Deck();
         init(deck);
@@ -284,6 +284,8 @@ public class Game {
                 inputError();
             }
 
+            checkInvisibleCard();
+
             if(isGameClear()) {
                 System.out.println("게임에서 승리하셨습니다.");
                 flag = false;
@@ -293,6 +295,18 @@ public class Game {
 
         if(!flag) {
             gameover();
+        }
+    }
+
+    private void checkInvisibleCard() {
+        for (int i = 0; i < field.length; i++) {
+            if (field[i].isEmpty()) {
+                continue;
+            } else {
+                if (!field[i].peek().getVisibleType()) {
+                    field[i].peek().setVisibleType(true);
+                }
+            }
         }
     }
 
