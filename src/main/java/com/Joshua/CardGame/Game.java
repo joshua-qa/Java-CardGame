@@ -61,11 +61,16 @@ public class Game {
             if (select == 0) {
                 return false;
             } else if (select > 0 && select <= start.size()) {
-                if (isChain(start, select)) {
-                    flag = false;
-                    break;
+                if (isVisible(start, select)) {
+                    if (isChain(start, select)) {
+                        flag = false;
+                        break;
+                    } else {
+                        System.out.println("카드가 연결되어 있지 않습니다. 연결되어있는 장수 이내에서 입력해주세요.");
+                        return move(start, dest, sc);
+                    }
                 } else {
-                    System.out.println("카드가 연결되어 있지 않습니다. 연결되어있는 장수 이내에서 입력해주세요.");
+                    System.err.println("잘못 입력하셨습니다. 다시 입력해주세요.");
                     return move(start, dest, sc);
                 }
             } else {
@@ -90,6 +95,10 @@ public class Game {
         }
 
         return true;
+    }
+
+    private boolean isVisible(Stack<Card> start, int select) {
+        return start.elementAt(start.size()-select).getVisibleType();
     }
 
     private int cardPosition(Stack<Card> target, int index) {
