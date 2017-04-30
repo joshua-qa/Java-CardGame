@@ -21,4 +21,16 @@ public class Field extends Stack<Card> {
         }
         return Collections.max(fieldSizeArray);
     }
+
+    public static void checkInvisibleCard(Field[] field) {
+        for (int i = 0; i < field.length; i++) {
+            if (field[i].isEmpty()) {
+                continue;
+            } else {
+                if (!field[i].peek().getVisibleType()) {
+                    field[i].peek().setVisibleType(true);
+                }
+            }
+        }
+    }
 }
