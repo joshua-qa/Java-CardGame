@@ -9,6 +9,7 @@ public class Game {
     private Stack<Card> tempDeck, mainDeck;
     private Field[] field;
     private Home[] home; // 0 : spade, 1 : heart, 2 : diamond, 3 : club
+    private static boolean GAME_FLAG = true;
 
     public void init(Deck deck) {
         home = new Home[4];
@@ -22,9 +23,11 @@ public class Game {
 
         for (int i = 0; i < field.length; i++) {
             field[i] = new Field();
-            for(int j = 0; j <= i; j++) {
+            for(int j = 0; j < i; j++) {
                 field[i].add(deck.getCards().pop());
+                field[i].peek().setVisibleType(false);
             }
+            field[i].add(deck.getCards().pop());
         }
 
         mainDeck = (Stack<Card>)deck.getCards().clone();
@@ -59,11 +62,16 @@ public class Game {
             if (select == 0) {
                 return false;
             } else if (select > 0 && select <= start.size()) {
-                if (isChain(start, select)) {
-                    flag = false;
-                    break;
+                if (isVisible(start, select)) {
+                    if (isChain(start, select)) {
+                        flag = false;
+                        break;
+                    } else {
+                        System.out.println("카드가 연결되어 있지 않습니다. 연결되어있는 장수 이내에서 입력해주세요.");
+                        return move(start, dest, sc);
+                    }
                 } else {
-                    System.out.println("카드가 연결되어 있지 않습니다. 연결되어있는 장수 이내에서 입력해주세요.");
+                    System.err.println("잘못 입력하셨습니다. 다시 입력해주세요.");
                     return move(start, dest, sc);
                 }
             } else {
@@ -88,6 +96,10 @@ public class Game {
         }
 
         return true;
+    }
+
+    private boolean isVisible(Stack<Card> start, int select) {
+        return start.elementAt(start.size()-select).getVisibleType();
     }
 
     private int cardPosition(Stack<Card> target, int index) {
@@ -202,98 +214,67 @@ public class Game {
         return true;
     }
 
-    private void homeDisplay() {
-        for (int i = 0; i < home.length; i++) {
-            if (home[i].size() == 0) {
-                System.out.print("[    ] ");
-            } else {
-                System.out.print(home[i].peek().toString() + " ");
-            }
-        }
-    }
-
-    private void deckDisplay() {
-        if (tempDeck.size() == 0) {
-            System.out.println("             [    ]\n");
-        } else {
-            System.out.println("              " + tempDeck.peek().toString() + "\n");
-        }
-    }
-
-    private void cardDisplay() {
-        for (int i = 0; i < Field.getFieldMaxSize(field); i++) {
-            for (int j = 0; j < field.length; j++) {
-                if (field[j].size() <= i) {
-                    System.out.print("------ ");
-                } else {
-                    System.out.print(field[j].elementAt(i).toString() + " ");
-                }
-            }
-            System.out.print("\n");
-        }
-    }
-
     private void gameDisplay() {
-        homeDisplay();
-        deckDisplay();
-        cardDisplay();
+        Display display = new Display();
+        display.homeDisplay(home);
+        display.deckDisplay(tempDeck);
+        display.cardDisplay(field);
     }
-
-
 
     public void play() {
         Deck deck = new Deck();
         init(deck);
-        menu();
+        while(GAME_FLAG) {
+            gameDisplay();
+
+            menu();
+
+            Field.checkInvisibleCard(field);
+
+            if(isGameClear()) {
+                System.out.println("게임에서 승리하셨습니다.");
+                GAME_FLAG = false;
+            }
+        }
+
+        gameover();
     }
 
     public void menu() {
         Scanner scan = new Scanner(System.in);
-        boolean flag = true;
+        //boolean flag = true;
         int select = 0, selectTarget = 0;
 
         // 메서드 분리 필요할듯.
-        while(flag) {
-            gameDisplay();
-            System.out.println("명령어를 입력해주세요. 1 : 카드 넘기기, 2 : 카드 이동(필드), 3 : 카드 이동(덱), 9: 종료");
+        //while(flag) {
+        System.out.println("명령어를 입력해주세요. 1 : 카드 넘기기, 2 : 카드 이동(필드), 3 : 카드 이동(덱), 9: 종료");
+        select = inputCheck(scan);
+        if(select == 1) {
+            deckCardPop();
+        } else if(select == 2) {
+            System.out.println("이동할 카드가 있는 필드 번호를 입력해주세요. (1-7)");
             select = inputCheck(scan);
-            if(select == 1) {
-                deckCardPop();
-            } else if(select == 2) {
-                System.out.println("이동할 카드가 있는 필드 번호를 입력해주세요. (1-7)");
-                select = inputCheck(scan);
-                if((select > 0 && select <= 7) && !field[select-1].isEmpty()) {
-                    System.out.println("이동하려는 위치를 입력해주세요. (필드는 1-7, 홈은 0)");
-                    selectTarget = inputCheck(scan);
-                    if(selectTarget == 0) {
-                        moveHome(field[select-1]);
-                    } else if(selectTarget > 0 && selectTarget <= 7) {
-                        move(field[select-1], field[selectTarget-1], scan);
-                    } else {
-                        inputError();
-                    }
+            if((select > 0 && select <= 7) && !field[select-1].isEmpty()) {
+                System.out.println("이동하려는 위치를 입력해주세요. (필드는 1-7, 홈은 0)");
+                selectTarget = inputCheck(scan);
+                if(selectTarget == 0) {
+                    moveHome(field[select-1]);
+                } else if(selectTarget > 0 && selectTarget <= 7) {
+                    move(field[select-1], field[selectTarget-1], scan);
                 } else {
                     inputError();
                 }
-            } else if(select == 3) {
-                moveDeck(scan);
-            } else if(select == 9) {
-                flag = false;
-                break;
             } else {
                 inputError();
             }
-
-            if(isGameClear()) {
-                System.out.println("게임에서 승리하셨습니다.");
-                flag = false;
-                break;
-            }
+        } else if(select == 3) {
+            moveDeck(scan);
+        } else if(select == 9) {
+            GAME_FLAG = false;
+        } else {
+            inputError();
         }
 
-        if(!flag) {
-            gameover();
-        }
     }
 
     private boolean isGameClear() {

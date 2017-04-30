@@ -20,10 +20,10 @@ public class Deck {
         for(Card.CardType cardType : Card.CardType.values()) {
             for(Card.CardNumber cardNumber : Card.CardNumber.values()) {
                 if (cardType.equals(Card.CardType.SPADE) || cardType.equals(Card.CardType.CLUB)) {
-                    Card card = new Card(cardNumber, cardType, Card.ColorType.BLACK);
+                    Card card = new Card(cardNumber, cardType, Card.ColorType.BLACK, true);
                     cards.push(card);
                 } else if (cardType.equals(Card.CardType.HEART) || cardType.equals(Card.CardType.DIAMOND)) {
-                    Card card = new Card(cardNumber, cardType, Card.ColorType.RED);
+                    Card card = new Card(cardNumber, cardType, Card.ColorType.RED, true);
                     cards.push(card);
                 }
             }
