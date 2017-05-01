@@ -1,6 +1,7 @@
 package com.Joshua.CardGame;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Created by Joshua on 2017-03-28.
@@ -10,6 +11,8 @@ public class Game {
     private Field[] field;
     private Home[] home; // 0 : spade, 1 : heart, 2 : diamond, 3 : club
     private static boolean GAME_FLAG = true;
+    private static final int KING_CARD_NUM = 13;
+    private static final int ACE_CARD_NUM = 1;
 
     public void init(Deck deck) {
         home = new Home[4];
@@ -17,9 +20,7 @@ public class Game {
         tempDeck = new Stack<>();
         mainDeck = new Stack<>();
 
-        for (int i = 0; i < home.length; i++) {
-            home[i] = new Home();
-        }
+        IntStream.range(0, home.length).forEach((int i) -> home[i] = new Home());
 
         for (int i = 0; i < field.length; i++) {
             field[i] = new Field();
@@ -38,10 +39,7 @@ public class Game {
         if (mainDeck.isEmpty() && tempDeck.size() > 0) {
             System.out.println("이전에 넘긴 카드를 다시 덱으로 돌립니다.");
             int deckSize = tempDeck.size();
-            for(int i = 0; i < deckSize; i++) {
-                mainDeck.push(tempDeck.pop());
-            }
-
+            IntStream.range(0, deckSize).forEach((int i) -> mainDeck.push(tempDeck.pop()));
             return false;
         } else if (mainDeck.isEmpty() && tempDeck.size() == 0) {
             System.err.println("더 이상 넘길 카드가 없습니다.\n");
@@ -98,7 +96,7 @@ public class Game {
         return true;
     }
 
-    private boolean isVisible(Stack<Card> start, int select) {
+    private boolean isVisible (Stack<Card> start, int select) {
         return start.elementAt(start.size()-select).getVisibleType();
     }
 
@@ -187,11 +185,11 @@ public class Game {
     }
 
     public boolean isKing(Card card) {
-        return card.getCardNumber().getRank() == 13;
+        return card.getCardNumber().getRank() == KING_CARD_NUM;
     }
 
     public boolean isAce(Card card) {
-        return card.getCardNumber().getRank() == 1;
+        return card.getCardNumber().getRank() == ACE_CARD_NUM;
     }
 
     public boolean isChain(Stack<Card> field, int input) {
@@ -242,11 +240,9 @@ public class Game {
 
     public void menu() {
         Scanner scan = new Scanner(System.in);
-        //boolean flag = true;
         int select = 0, selectTarget = 0;
 
         // 메서드 분리 필요할듯.
-        //while(flag) {
         System.out.println("명령어를 입력해주세요. 1 : 카드 넘기기, 2 : 카드 이동(필드), 3 : 카드 이동(덱), 9: 종료");
         select = inputCheck(scan);
         if(select == 1) {
