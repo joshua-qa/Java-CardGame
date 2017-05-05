@@ -78,15 +78,19 @@ public class Game {
             }
         }
 
-        if(isKing(start.elementAt(cardPosition(start, select))) && dest.isEmpty()) {
+        final boolean isKingInclude = isKing(start.elementAt(cardPosition(start, select)));
+
+        if(isKingInclude && dest.isEmpty()) {
             moveCard(start, dest, select);
             return true;
-        } else if(!isKing(start.elementAt(cardPosition(start, select))) && dest.isEmpty()) {
+        } else if(!isKingInclude && dest.isEmpty()) {
             System.err.println("이동하려는 필드가 비어있지만 옮기려는 카드에 킹이 포함되어 있지 않습니다.\n메뉴로 돌아가서 이동할 위치를 다시 입력해주세요.");
             return false;
         }
 
-        if(isMovable(start.elementAt(cardPosition(start, select)), dest.peek())) {
+        final boolean movableCheck = isMovable(start.elementAt(cardPosition(start, select)), dest.peek());
+
+        if(movableCheck) {
             moveCard(start, dest, select);
         } else {
             System.err.println("그곳으로는 이동할 수 없습니다.\n이동할 카드 장수를 다시 입력해주시거나, 메뉴로 돌아가서 이동할 위치를 다시 입력해주세요.");
@@ -194,8 +198,10 @@ public class Game {
 
     public boolean isChain(Stack<Card> field, int input) {
         for (int i = field.size() - input; i < field.size() - 1; i++) {
-            if (! ((field.elementAt(i).getCardNumber().getRank() - 1 == field.elementAt(i+1).getCardNumber().getRank())
-                && (!field.elementAt(i).getColorType().getColorTypeValue().equals( field.elementAt(i+1).getColorType().getColorTypeValue() ))) ) {
+            final boolean chainCheck = (field.elementAt(i).getCardNumber().getRank() - 1 == field.elementAt(i+1).getCardNumber().getRank())
+                                    && (!field.elementAt(i).getColorType().getColorTypeValue().equals( field.elementAt(i+1).getColorType().getColorTypeValue()));
+
+            if (!chainCheck) {
                 return false;
             }
         }
@@ -204,8 +210,10 @@ public class Game {
     }
 
     public boolean isMovable(Card start, Card dest) {
-        if (! ((start.getCardNumber().getRank() == dest.getCardNumber().getRank()-1)
-                && (!start.getColorType().getColorTypeValue().equals( dest.getColorType().getColorTypeValue() ))) ) {
+        final boolean movableCheck = (start.getCardNumber().getRank() == dest.getCardNumber().getRank()-1)
+                                   && (!start.getColorType().getColorTypeValue().equals(dest.getColorType().getColorTypeValue()));
+
+        if (!movableCheck) {
             return false;
         }
 
